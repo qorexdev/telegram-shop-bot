@@ -110,6 +110,24 @@ telegram-shop-bot/
 
 MIT
 
+
+---
+
+<details>
+<summary>☕ Support</summary>
+
+<br>
+
+If you find this project useful, you can support the development:
+
+| Method | Address |
+|--------|---------|
+| TON/USDT | `UQDdkmbEkv5sxj1xmmYp32qx4DwhVonYp25j8EWGjKWf29Ad` |
+| USDT (TRC20) | `TEEmV49goUnrPZ544vRKG4MYKaffKk9ZVn` |
+| Card (RU) | `2204 3209 4249 7365` |
+
+</details>
+
 ---
 
 <p align="center">
