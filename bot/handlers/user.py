@@ -36,6 +36,15 @@ async def cmd_help(message: Message):
     await message.answer(HELP)
 
 
+@user_router.message(Command("about"))
+async def cmd_about(message: Message):
+    await message.answer(
+        "🛠 Developed by qorex\n\n"
+        '📱 Telegram: <a href="https://t.me/qorexdev">@qorexdev</a>\n'
+        '💻 GitHub: <a href="https://github.com/qorexdev">github.com/qorexdev</a>'
+    )
+
+
 @user_router.message(Command("catalog"))
 @user_router.message(F.text == "🛍 Catalog")
 async def cmd_catalog(message: Message, session: AsyncSession):
