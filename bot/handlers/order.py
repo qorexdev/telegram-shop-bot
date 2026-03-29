@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from bot.database.models import Cart, CartItem, Order, OrderItem
-from bot.keyboards.reply import main_menu_kb
+
 from bot.utils.texts import (
     NO_ORDERS,
     ORDER_CREATED,
