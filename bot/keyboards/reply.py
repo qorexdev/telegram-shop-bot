@@ -16,7 +16,8 @@ def admin_menu_kb() -> ReplyKeyboardMarkup:
         keyboard=[
             [KeyboardButton(text="➕ Add Category"), KeyboardButton(text="➕ Add Product")],
             [KeyboardButton(text="🗑 Delete Category"), KeyboardButton(text="🗑 Delete Product")],
-            [KeyboardButton(text="📦 Toggle Stock"), KeyboardButton(text="🔙 Back to Menu")],
+            [KeyboardButton(text="📦 Toggle Stock"), KeyboardButton(text="📊 Stats")],
+            [KeyboardButton(text="🔙 Back to Menu")],
         ],
         resize_keyboard=True,
     )

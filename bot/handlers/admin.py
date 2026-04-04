@@ -3,11 +3,11 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.config import get_settings
-from bot.database.models import Category, Product
+from bot.database.models import Category, Order, OrderItem, Product
 from bot.keyboards.inline import admin_categories_kb, admin_products_kb
 from bot.keyboards.reply import admin_menu_kb, main_menu_kb
 from bot.utils.texts import (
@@ -27,6 +27,8 @@ from bot.utils.texts import (
     ADMIN_PRODUCTS_EMPTY,
     ADMIN_SELECT_CATEGORY,
     ADMIN_SELECT_PRODUCT,
+    ADMIN_STATS_EMPTY,
+    ADMIN_STATS_TEXT,
     ADMIN_STOCK_TOGGLED,
     ADMIN_TOGGLE_STOCK,
     IN_STOCK,
@@ -273,3 +275,42 @@ async def cb_toggle_stock(callback: CallbackQuery, session: AsyncSession):
         status = IN_STOCK if product.in_stock else OUT_OF_STOCK
         await callback.message.edit_text(ADMIN_STOCK_TOGGLED.format(name=product.name, status=status))
     await callback.answer()
+
+
+@admin_router.message(F.text == "📊 Stats")
+async def cmd_stats(message: Message, session: AsyncSession):
+    if not is_admin(message.from_user.id):
+        return
+
+    order_count = (await session.execute(select(func.count(Order.id)))).scalar() or 0
+    if not order_count:
+        await message.answer(ADMIN_STATS_EMPTY)
+        return
+
+    revenue = (await session.execute(select(func.sum(Order.total)))).scalar() or 0.0
+    product_count = (await session.execute(select(func.count(Product.id)))).scalar() or 0
+    pending = (await session.execute(
+        select(func.count(Order.id)).where(Order.status == "pending")
+    )).scalar() or 0
+
+    top_rows = (await session.execute(
+        select(OrderItem.product_name, func.sum(OrderItem.quantity).label("sold"))
+        .group_by(OrderItem.product_name)
+        .order_by(func.sum(OrderItem.quantity).desc())
+        .limit(5)
+    )).all()
+
+    top_text = ""
+    for i, row in enumerate(top_rows, 1):
+        top_text += f"  {i}. {row.product_name} — {row.sold} sold\n"
+
+    await message.answer(
+        ADMIN_STATS_TEXT.format(
+            orders=order_count,
+            revenue=revenue,
+            products=product_count,
+            pending=pending,
+            top_products=top_text,
+        ),
+        parse_mode="HTML",
+    )

@@ -77,3 +77,14 @@ ADMIN_PRODUCT_DELETED = "Product deleted."
 ADMIN_PRODUCTS_EMPTY = "No products in this category."
 ADMIN_TOGGLE_STOCK = "Select a product to toggle stock status:"
 ADMIN_STOCK_TOGGLED = "Stock status for '{name}' changed to: {status}"
+
+ADMIN_STATS_EMPTY = "No orders yet — nothing to show."
+ADMIN_STATS_TEXT = (
+    "📊 <b>Shop Stats</b>\n\n"
+    "Orders: <b>{orders}</b>\n"
+    "Revenue: <b>${revenue:.2f}</b>\n"
+    "Products: <b>{products}</b>\n"
+    "Pending orders: <b>{pending}</b>\n\n"
+    "🏆 <b>Top products:</b>\n"
+    "{top_products}"
+)
