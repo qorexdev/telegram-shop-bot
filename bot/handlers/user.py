@@ -1,5 +1,7 @@
 from aiogram import F, Router
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,14 +21,23 @@ from bot.utils.texts import (
     PRODUCT_CARD,
     PRODUCT_NOT_FOUND,
     PRODUCTS_TITLE,
+    SEARCH_NO_RESULTS,
+    SEARCH_PROMPT,
+    SEARCH_RESULTS,
+    SEARCH_TOO_SHORT,
     WELCOME,
 )
 
 user_router = Router()
 
 
+class SearchState(StatesGroup):
+    waiting_query = State()
+
+
 @user_router.message(Command("start"))
-async def cmd_start(message: Message):
+async def cmd_start(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer(WELCOME, reply_markup=main_menu_kb())
 
 
@@ -34,6 +45,41 @@ async def cmd_start(message: Message):
 @user_router.message(F.text == "ℹ️ Help")
 async def cmd_help(message: Message):
     await message.answer(HELP)
+
+
+@user_router.message(Command("search"))
+@user_router.message(F.text == "🔍 Search")
+async def cmd_search(message: Message, state: FSMContext, session: AsyncSession, command: CommandObject = None):
+    # /search <query> — search immediately
+    if command and command.args and len(command.args.strip()) >= 2:
+        await _do_search(message, command.args.strip(), session)
+        return
+    await state.set_state(SearchState.waiting_query)
+    await message.answer(SEARCH_PROMPT)
+
+
+@user_router.message(SearchState.waiting_query)
+async def handle_search_query(message: Message, state: FSMContext, session: AsyncSession):
+    await state.clear()
+    query = message.text.strip() if message.text else ""
+    if len(query) < 2:
+        await message.answer(SEARCH_TOO_SHORT)
+        return
+    await _do_search(message, query, session)
+
+
+async def _do_search(message: Message, query: str, session: AsyncSession):
+    result = await session.execute(
+        select(Product).where(Product.in_stock == True, Product.name.ilike(f"%{query}%"))
+    )
+    products = result.scalars().all()
+    if not products:
+        await message.answer(SEARCH_NO_RESULTS.format(query=query))
+        return
+    await message.answer(
+        SEARCH_RESULTS.format(count=len(products), query=query),
+        reply_markup=products_kb(products),
+    )
 
 
 @user_router.message(Command("about"))

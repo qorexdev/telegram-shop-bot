@@ -8,6 +8,7 @@ HELP = (
     "Available commands:\n\n"
     "/start — Main menu\n"
     "/catalog — Browse products\n"
+    "/search — Search products by name\n"
     "/cart — View your cart\n"
     "/orders — Order history\n"
     "/help — This message"
@@ -57,6 +58,11 @@ ORDER_SUMMARY = (
 )
 
 CONFIRM_ORDER = "Place your order?\n\nTotal: <b>${total:.2f}</b>"
+
+SEARCH_PROMPT = "Send me a product name to search for:"
+SEARCH_NO_RESULTS = "Nothing found for \"{query}\". Try a different search term."
+SEARCH_RESULTS = "Found {count} product(s) for \"{query}\":"
+SEARCH_TOO_SHORT = "Please enter at least 2 characters."
 
 # Admin texts
 ADMIN_PANEL = "Admin panel. Choose an action:"

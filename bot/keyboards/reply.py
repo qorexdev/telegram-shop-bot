@@ -5,7 +5,8 @@ def main_menu_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="🛍 Catalog"), KeyboardButton(text="🛒 Cart")],
-            [KeyboardButton(text="📦 My Orders"), KeyboardButton(text="ℹ️ Help")],
+            [KeyboardButton(text="🔍 Search"), KeyboardButton(text="📦 My Orders")],
+            [KeyboardButton(text="ℹ️ Help")],
         ],
         resize_keyboard=True,
     )
